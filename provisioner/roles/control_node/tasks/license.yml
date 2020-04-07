@@ -1,0 +1,43 @@
+---
+- name: Ensure eula is accepted if posting license
+  lineinfile:
+    path: "{{ playbook_dir }}/tower_license.json"
+    line: '   "eula_accepted": true,'
+    insertbefore: '"company_name"'
+    state: present
+  when:
+    - tower_license is undefined
+
+- name: set tower_license variable if not defined
+  set_fact:
+    tower_license: "{{ lookup('file', playbook_dir+'/tower_license.json') }}"
+  no_log: true
+  when:
+    - tower_license is undefined
+
+- name: Verify Tower License expiration (1/2)
+  assert:
+    that:
+      - tower_license.license_date|int > (lookup('pipe','date +%s')|int)
+    fail_msg: "Your Tower License is expired"
+  when:
+    - tower_license.license_date is defined
+
+- name: Verify Tower License expiration (2/2)
+  assert:
+    that:
+      - (tower_license | from_json)['license_date']|int > (lookup('pipe','date +%s')|int)
+    fail_msg: "Your Tower License is expired"
+  when:
+    - tower_license.license_date is undefined
+
+- name: Post license key
+  uri:
+    url: https://{{ansible_host}}/api/v2/config/
+    method: POST
+    user: admin
+    password: "{{ admin_password }}"
+    body: "{{ tower_license }}"
+    body_format: json
+    validate_certs: false
+    force_basic_auth: true

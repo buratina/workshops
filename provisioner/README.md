@@ -71,7 +71,7 @@ towerinstall: true
 autolicense: true
 ```
 
-If you want to license it you must copy a license called tower_license.json into this directory.  If you do not have a license already please request one using the [Workshop License Link](https://www.ansible.com/workshop-license).
+If you want to license it you must copy a license called tower_license.json into this directory. Alternatively, you can provide the license with the tower_license variable.  If you do not have a license already please request one using the [Workshop License Link](https://www.ansible.com/workshop-license).
 
 For more extra_vars examples, look at the following:
 - [sample-vars-rhel.yml](sample_workshops/sample-vars-rhel.yml) - example for the Ansible RHEL Workshop
